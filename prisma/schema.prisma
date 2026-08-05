@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MODERATOR
+}
+
+enum TimerStatus {
+  NOT_STARTED
+  RUNNING
+  PAUSED
+  FINISHED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  role         Role
+  station      Station? @relation(fields: [stationId], references: [id])
+  stationId    String?
+  createdAt    DateTime @default(now())
+
+  transactions Transaction[]
+}
+
+model Station {
+  id     String @id @default(cuid())
+  number Int    @unique
+  name   String
+
+  users        User[]
+  transactions Transaction[]
+}
+
+model Team {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  note   String?
+
+  timerStatus             TimerStatus @default(NOT_STARTED)
+  timerStartedAt           DateTime?
+  timerAccumulatedSeconds  Int         @default(0)
+  timerBudgetSeconds       Int         @default(2700)
+
+  createdAt DateTime @default(now())
+
+  transactions Transaction[]
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId    String
+  station   Station? @relation(fields: [stationId], references: [id])
+  stationId String?
+  amount    Int
+  note      String
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+  createdById String?
+  createdAt DateTime @default(now())
+
+  @@index([teamId])
+}
