@@ -41,59 +41,52 @@ export default function AdminTeamsPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/admin" className="text-xs text-slate-500 hover:underline">
+    <div className="page">
+      <Link href="/admin" className="link-muted text-xs">
         &larr; Back to dashboard
       </Link>
-      <h1 className="mb-6 mt-2 text-2xl font-semibold text-slate-900">Teams</h1>
+      <h1 className="mb-6 mt-2 font-display text-2xl font-semibold uppercase text-[var(--gold-bright)]">Teams</h1>
 
-      <form onSubmit={handleCreate} className="mb-8 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="mb-3 text-sm font-semibold text-slate-700">Register a new team</h2>
+      <form onSubmit={handleCreate} className="card mb-8 p-4">
+        <h2 className="mb-3 text-sm font-semibold text-[var(--text-muted)]">Register a new team</h2>
         <div className="flex flex-wrap gap-3">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Team name"
-            className="min-w-[10rem] flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+            className="input min-w-[10rem] flex-1"
           />
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Note (optional)"
-            className="min-w-[10rem] flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+            className="input min-w-[10rem] flex-1"
           />
-          <button
-            disabled={submitting}
-            type="submit"
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-          >
+          <button disabled={submitting} type="submit" className="btn-primary">
             Register
           </button>
         </div>
-        {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+        {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
       </form>
 
       <div className="space-y-2">
         {teams?.map((team) => (
-          <div
-            key={team.id}
-            className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3"
-          >
+          <div key={team.id} className="card flex items-center justify-between px-4 py-3">
             <div>
-              <Link href={`/admin/teams/${team.id}`} className="font-medium text-slate-900 hover:underline">
+              <Link href={`/admin/teams/${team.id}`} className="font-medium text-[var(--text)] hover:text-[var(--gold-bright)] hover:underline">
                 {team.name}
               </Link>
-              {team.note && <p className="text-xs text-slate-500">{team.note}</p>}
+              {team.note && <p className="text-xs text-[var(--text-muted)]">{team.note}</p>}
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm font-semibold text-slate-900">{formatCurrency(team.balance)}</span>
-              <button onClick={() => handleDelete(team.id, team.name)} className="text-xs text-red-600 hover:underline">
+              <span className="text-sm font-semibold text-[var(--gold-bright)]">{formatCurrency(team.balance)}</span>
+              <button onClick={() => handleDelete(team.id, team.name)} className="text-xs text-red-400 hover:underline">
                 Delete
               </button>
             </div>
           </div>
         ))}
-        {teams?.length === 0 && <p className="text-sm text-slate-500">No teams yet.</p>}
+        {teams?.length === 0 && <p className="text-sm text-[var(--text-muted)]">No teams yet.</p>}
       </div>
     </div>
   );

@@ -64,19 +64,19 @@ export function TeamCard({
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+    <div className="card p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="font-semibold text-slate-900">{team.name}</h3>
-          {team.note && <p className="text-xs text-slate-500">{team.note}</p>}
+          <h3 className="font-display text-base font-semibold text-[var(--text)]">{team.name}</h3>
+          {team.note && <p className="text-xs text-[var(--text-muted)]">{team.note}</p>}
         </div>
         <div className="text-right">
-          <div className="text-lg font-semibold text-slate-900">{formatCurrency(team.balance)}</div>
-          <div className="text-xs text-slate-400">current balance</div>
+          <div className="text-lg font-semibold text-[var(--gold-bright)]">{formatCurrency(team.balance)}</div>
+          <div className="text-xs text-[var(--text-muted)]">current balance</div>
         </div>
       </div>
 
-      <div className="mt-3 border-t border-slate-100 pt-3">
+      <div className="mt-3 border-t border-[var(--border-gold)] pt-3">
         <TimerControl
           status={team.timerStatus}
           remainingSeconds={team.timerRemainingSeconds}
@@ -85,37 +85,33 @@ export function TeamCard({
         />
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-3 flex flex-wrap items-end gap-2 border-t border-slate-100 pt-3">
+      <form onSubmit={handleSubmit} className="mt-3 flex flex-wrap items-end gap-2 border-t border-[var(--border-gold)] pt-3">
         <div>
-          <label className="mb-1 block text-xs font-medium text-slate-600">Amount (± ₹)</label>
+          <label className="label">Amount (± ₹)</label>
           <input
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="e.g. -5000"
-            className="w-32 rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+            className="input w-32 py-1.5"
           />
         </div>
         <div className="min-w-[10rem] flex-1">
-          <label className="mb-1 block text-xs font-medium text-slate-600">Note</label>
+          <label className="label">Note</label>
           <input
             type="text"
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Reason for adjustment"
-            className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+            className="input py-1.5"
           />
         </div>
-        <button
-          type="submit"
-          disabled={submitting}
-          className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-        >
+        <button type="submit" disabled={submitting} className="btn-primary py-1.5">
           Add
         </button>
       </form>
 
-      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
     </div>
   );
 }

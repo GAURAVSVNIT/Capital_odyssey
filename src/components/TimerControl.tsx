@@ -35,45 +35,29 @@ export function TimerControl({
     <div className="flex items-center gap-3">
       <span
         className={`font-mono text-lg tabular-nums ${
-          expired
-            ? "text-red-600"
-            : status === "RUNNING"
-              ? "text-emerald-600"
-              : "text-slate-700"
+          expired ? "text-red-400" : status === "RUNNING" ? "text-[var(--gold-bright)]" : "text-[var(--text-muted)]"
         }`}
       >
         {formatDuration(display)}
       </span>
 
       {status === "NOT_STARTED" && (
-        <button
-          disabled={busy}
-          onClick={() => onAction("start")}
-          className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-        >
+        <button disabled={busy} onClick={() => onAction("start")} className="btn-primary px-3 py-1.5 text-xs">
           Start
         </button>
       )}
       {status === "RUNNING" && (
-        <button
-          disabled={busy}
-          onClick={() => onAction("pause")}
-          className="rounded-md border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-100 disabled:opacity-50"
-        >
+        <button disabled={busy} onClick={() => onAction("pause")} className="btn-outline px-3 py-1.5 text-xs">
           Pause
         </button>
       )}
       {status === "PAUSED" && !expired && (
-        <button
-          disabled={busy}
-          onClick={() => onAction("resume")}
-          className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-        >
+        <button disabled={busy} onClick={() => onAction("resume")} className="btn-primary px-3 py-1.5 text-xs">
           Resume
         </button>
       )}
       {(status === "FINISHED" || expired) && (
-        <span className="rounded-md bg-red-50 px-2 py-1 text-xs font-medium uppercase tracking-wide text-red-600">
+        <span className="rounded-md border border-red-500/30 bg-red-500/10 px-2 py-1 text-xs font-medium uppercase tracking-wide text-red-300">
           Time up
         </span>
       )}

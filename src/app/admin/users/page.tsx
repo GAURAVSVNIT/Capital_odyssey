@@ -40,33 +40,31 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8">
-      <Link href="/admin" className="text-xs text-slate-500 hover:underline">
+    <div className="page max-w-2xl">
+      <Link href="/admin" className="link-muted text-xs">
         &larr; Back to dashboard
       </Link>
-      <h1 className="mb-6 mt-2 text-2xl font-semibold text-slate-900">Station Moderators</h1>
+      <h1 className="mb-6 mt-2 font-display text-2xl font-semibold uppercase text-[var(--gold-bright)]">
+        Station Moderators
+      </h1>
 
-      <form onSubmit={handleCreate} className="mb-8 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="mb-3 text-sm font-semibold text-slate-700">Create a moderator account</h2>
+      <form onSubmit={handleCreate} className="card mb-8 p-4">
+        <h2 className="mb-3 text-sm font-semibold text-[var(--text-muted)]">Create a moderator account</h2>
         <div className="flex flex-wrap gap-3">
           <input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Username"
-            className="min-w-[8rem] flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+            className="input min-w-[8rem] flex-1"
           />
           <input
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="text"
             placeholder="Password"
-            className="min-w-[8rem] flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+            className="input min-w-[8rem] flex-1"
           />
-          <select
-            value={stationId}
-            onChange={(e) => setStationId(e.target.value)}
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
-          >
+          <select value={stationId} onChange={(e) => setStationId(e.target.value)} className="input">
             <option value="">Assign station…</option>
             {stations?.map((s) => (
               <option key={s.id} value={s.id}>
@@ -74,35 +72,28 @@ export default function AdminUsersPage() {
               </option>
             ))}
           </select>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-          >
+          <button type="submit" disabled={submitting} className="btn-primary">
             Create
           </button>
         </div>
-        {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+        {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
       </form>
 
       <div className="space-y-2">
         {users?.map((u) => (
-          <div
-            key={u.id}
-            className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3"
-          >
+          <div key={u.id} className="card flex items-center justify-between px-4 py-3">
             <div>
-              <p className="font-medium text-slate-900">{u.username}</p>
-              <p className="text-xs text-slate-500">
+              <p className="font-medium text-[var(--text)]">{u.username}</p>
+              <p className="text-xs text-[var(--text-muted)]">
                 {u.station ? `Station ${u.station.number} · ${u.station.name}` : "No station assigned"}
               </p>
             </div>
-            <button onClick={() => handleDelete(u.id, u.username)} className="text-xs text-red-600 hover:underline">
+            <button onClick={() => handleDelete(u.id, u.username)} className="text-xs text-red-400 hover:underline">
               Remove
             </button>
           </div>
         ))}
-        {users?.length === 0 && <p className="text-sm text-slate-500">No moderators yet.</p>}
+        {users?.length === 0 && <p className="text-sm text-[var(--text-muted)]">No moderators yet.</p>}
       </div>
     </div>
   );

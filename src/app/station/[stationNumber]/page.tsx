@@ -15,11 +15,14 @@ export default async function StationPage({
   if (!station) notFound();
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <h1 className="mb-1 text-2xl font-semibold text-slate-900">
-        Station {station.number}: {station.name}
+    <div className="page">
+      <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gold-dim)]">
+        Station {station.number}
+      </p>
+      <h1 className="mb-1 font-display text-2xl font-semibold uppercase text-[var(--gold-bright)]">
+        {station.name}
       </h1>
-      <p className="mb-6 text-sm text-slate-500">
+      <p className="mb-6 text-sm text-[var(--text-muted)]">
         Search a team, manage their timer, and record cash adjustments for this station.
       </p>
       <StationTeamList stationId={station.id} />

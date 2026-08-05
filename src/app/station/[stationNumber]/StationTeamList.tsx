@@ -25,13 +25,13 @@ export function StationTeamList({ stationId }: { stationId: string }) {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search team by name…"
-        className="mb-4 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+        className="input mb-4"
       />
 
-      {isLoading && <p className="text-sm text-slate-500">Loading teams…</p>}
-      {teams && teams.length === 0 && <p className="text-sm text-slate-500">No teams registered yet.</p>}
+      {isLoading && <p className="text-sm text-[var(--text-muted)]">Loading teams…</p>}
+      {teams && teams.length === 0 && <p className="text-sm text-[var(--text-muted)]">No teams registered yet.</p>}
       {teams && teams.length > 0 && filtered.length === 0 && (
-        <p className="text-sm text-slate-500">No teams match &ldquo;{search}&rdquo;.</p>
+        <p className="text-sm text-[var(--text-muted)]">No teams match &ldquo;{search}&rdquo;.</p>
       )}
 
       <div className="space-y-3">

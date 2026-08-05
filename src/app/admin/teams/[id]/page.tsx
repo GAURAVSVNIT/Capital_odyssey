@@ -74,26 +74,26 @@ export default function TeamLedgerPage() {
   }
 
   if (!team) {
-    return <div className="mx-auto max-w-3xl px-4 py-8 text-sm text-slate-500">Loading…</div>;
+    return <div className="page text-sm text-[var(--text-muted)]">Loading…</div>;
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8">
-      <Link href="/admin" className="text-xs text-slate-500 hover:underline">
+    <div className="page">
+      <Link href="/admin" className="link-muted text-xs">
         &larr; Back to dashboard
       </Link>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-900">{team.name}</h1>
-          {team.note && <p className="text-sm text-slate-500">{team.note}</p>}
+          <h1 className="font-display text-2xl font-semibold text-[var(--text)]">{team.name}</h1>
+          {team.note && <p className="text-sm text-[var(--text-muted)]">{team.note}</p>}
         </div>
         <div className="text-right">
-          <div className="text-2xl font-semibold text-slate-900">{formatCurrency(team.balance)}</div>
-          <div className="text-xs text-slate-400">current net worth</div>
+          <div className="text-2xl font-semibold text-[var(--gold-bright)]">{formatCurrency(team.balance)}</div>
+          <div className="text-xs text-[var(--text-muted)]">current net worth</div>
         </div>
       </div>
 
-      <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="card mt-4 p-4">
         <TimerControl
           status={team.timerStatus}
           remainingSeconds={team.timerRemainingSeconds}
@@ -102,25 +102,16 @@ export default function TeamLedgerPage() {
         />
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
-        <h2 className="mb-3 text-sm font-semibold text-slate-700">Add adjustment</h2>
+      <form onSubmit={handleSubmit} className="card mt-4 p-4">
+        <h2 className="mb-3 text-sm font-semibold text-[var(--text-muted)]">Add adjustment</h2>
         <div className="flex flex-wrap items-end gap-3">
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">Amount (± ₹)</label>
-            <input
-              type="number"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="w-36 rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
-            />
+            <label className="label">Amount (± ₹)</label>
+            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="input w-36" />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-600">Station (optional)</label>
-            <select
-              value={stationId}
-              onChange={(e) => setStationId(e.target.value)}
-              className="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
-            >
+            <label className="label">Station (optional)</label>
+            <select value={stationId} onChange={(e) => setStationId(e.target.value)} className="input">
               <option value="">Final settlement / general</option>
               {stations?.map((s) => (
                 <option key={s.id} value={s.id}>
@@ -130,55 +121,51 @@ export default function TeamLedgerPage() {
             </select>
           </div>
           <div className="min-w-[12rem] flex-1">
-            <label className="mb-1 block text-xs font-medium text-slate-600">Note</label>
+            <label className="label">Note</label>
             <input
               type="text"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="e.g. Investment returns revealed"
-              className="w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+              className="input"
             />
           </div>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-          >
+          <button type="submit" disabled={submitting} className="btn-primary">
             Add
           </button>
         </div>
-        {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+        {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
       </form>
 
       <div className="mt-6">
-        <h2 className="mb-2 text-sm font-semibold text-slate-700">Ledger</h2>
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+        <h2 className="mb-2 text-sm font-semibold text-[var(--text-muted)]">Ledger</h2>
+        <div className="table-shell">
+          <table>
+            <thead>
               <tr>
-                <th className="px-4 py-2">When</th>
-                <th className="px-4 py-2">Station</th>
-                <th className="px-4 py-2">Note</th>
-                <th className="px-4 py-2">By</th>
-                <th className="px-4 py-2 text-right">Amount</th>
+                <th>When</th>
+                <th>Station</th>
+                <th>Note</th>
+                <th>By</th>
+                <th className="text-right">Amount</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               <tr>
-                <td className="px-4 py-2 text-slate-400" colSpan={4}>
+                <td className="text-[var(--text-muted)]" colSpan={4}>
                   Starting capital
                 </td>
-                <td className="px-4 py-2 text-right font-medium text-slate-700">{formatCurrency(STARTING_CASH)}</td>
+                <td className="text-right font-medium text-[var(--text)]">{formatCurrency(STARTING_CASH)}</td>
               </tr>
               {transactions?.map((tx) => (
                 <tr key={tx.id}>
-                  <td className="px-4 py-2 text-xs text-slate-500">{new Date(tx.createdAt).toLocaleString()}</td>
-                  <td className="px-4 py-2 text-xs text-slate-500">
+                  <td className="text-xs text-[var(--text-muted)]">{new Date(tx.createdAt).toLocaleString()}</td>
+                  <td className="text-xs text-[var(--text-muted)]">
                     {tx.station ? `${tx.station.number}. ${tx.station.name}` : "—"}
                   </td>
-                  <td className="px-4 py-2">{tx.note}</td>
-                  <td className="px-4 py-2 text-xs text-slate-500">{tx.createdBy?.username ?? "—"}</td>
-                  <td className={`px-4 py-2 text-right font-medium ${tx.amount >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+                  <td>{tx.note}</td>
+                  <td className="text-xs text-[var(--text-muted)]">{tx.createdBy?.username ?? "—"}</td>
+                  <td className={`text-right font-medium ${tx.amount >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                     {tx.amount >= 0 ? "+" : ""}
                     {formatCurrency(tx.amount)}
                   </td>
@@ -186,7 +173,7 @@ export default function TeamLedgerPage() {
               ))}
               {transactions?.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="px-4 py-4 text-center text-slate-400">
+                  <td colSpan={5} className="py-4 text-center text-[var(--text-muted)]">
                     No transactions yet.
                   </td>
                 </tr>

@@ -6,6 +6,8 @@ import { fetcher } from "@/lib/fetcher";
 import { formatCurrency, formatDuration } from "@/lib/format";
 import type { TeamSummary } from "@/lib/types";
 
+const RANK_COLORS = ["#e8c766", "#c7c7d1", "#c98a4b"];
+
 export default function AdminDashboardPage() {
   const { data: teams, error, isLoading } = useSWR<TeamSummary[]>("/api/teams", fetcher, {
     refreshInterval: 3000,
@@ -14,31 +16,25 @@ export default function AdminDashboardPage() {
   const sorted = teams ? [...teams].sort((a, b) => b.balance - a.balance) : [];
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-8">
+    <div className="page">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-slate-900">Leaderboard</h1>
+        <h1 className="font-display text-2xl font-semibold uppercase text-[var(--gold-bright)]">Leaderboard</h1>
         <div className="flex gap-2">
-          <Link
-            href="/admin/teams"
-            className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-700"
-          >
+          <Link href="/admin/teams" className="btn-primary">
             Manage teams
           </Link>
-          <Link
-            href="/admin/users"
-            className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
-          >
+          <Link href="/admin/users" className="btn-outline">
             Moderators
           </Link>
         </div>
       </div>
 
-      {isLoading && <p className="text-sm text-slate-500">Loading teams…</p>}
-      {error && <p className="text-sm text-red-600">Failed to load teams.</p>}
+      {isLoading && <p className="text-sm text-[var(--text-muted)]">Loading teams…</p>}
+      {error && <p className="text-sm text-red-400">Failed to load teams.</p>}
       {teams && teams.length === 0 && (
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-[var(--text-muted)]">
           No teams registered yet.{" "}
-          <Link href="/admin/teams" className="underline">
+          <Link href="/admin/teams" className="text-[var(--gold-bright)] underline">
             Register one
           </Link>
           .
@@ -46,27 +42,32 @@ export default function AdminDashboardPage() {
       )}
 
       {sorted.length > 0 && (
-        <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white">
-          <table className="w-full text-sm">
-            <thead className="bg-slate-50 text-left text-xs uppercase tracking-wide text-slate-500">
+        <div className="table-shell">
+          <table>
+            <thead>
               <tr>
-                <th className="px-4 py-3">Rank</th>
-                <th className="px-4 py-3">Team</th>
-                <th className="px-4 py-3">Balance</th>
-                <th className="px-4 py-3">Timer</th>
+                <th>Rank</th>
+                <th>Team</th>
+                <th>Balance</th>
+                <th>Timer</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody>
               {sorted.map((team, idx) => (
-                <tr key={team.id} className={idx < 3 ? "bg-amber-50/60" : undefined}>
-                  <td className="px-4 py-3 font-medium text-slate-700">{idx + 1}</td>
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/teams/${team.id}`} className="font-medium text-slate-900 hover:underline">
+                <tr
+                  key={team.id}
+                  style={idx < 3 ? { background: "rgba(212, 175, 55, 0.07)" } : undefined}
+                >
+                  <td className="font-semibold" style={{ color: RANK_COLORS[idx] ?? "var(--text-muted)" }}>
+                    {idx + 1}
+                  </td>
+                  <td>
+                    <Link href={`/admin/teams/${team.id}`} className="font-medium text-[var(--text)] hover:text-[var(--gold-bright)] hover:underline">
                       {team.name}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 font-semibold text-slate-900">{formatCurrency(team.balance)}</td>
-                  <td className="px-4 py-3">
+                  <td className="font-semibold text-[var(--gold-bright)]">{formatCurrency(team.balance)}</td>
+                  <td>
                     <TimerBadge status={team.timerStatus} remaining={team.timerRemainingSeconds} />
                   </td>
                 </tr>
@@ -89,7 +90,11 @@ function TimerBadge({ status, remaining }: { status: TeamSummary["timerStatus"];
           ? "Paused"
           : "Finished";
   const color =
-    status === "RUNNING" ? "text-emerald-600" : status === "FINISHED" || remaining <= 0 ? "text-red-600" : "text-slate-500";
+    status === "RUNNING"
+      ? "text-emerald-400"
+      : status === "FINISHED" || remaining <= 0
+        ? "text-red-400"
+        : "text-[var(--text-muted)]";
 
   return (
     <span className={`font-mono text-xs ${color}`}>
