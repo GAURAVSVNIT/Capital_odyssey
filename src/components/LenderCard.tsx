@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { apiRequest } from "@/lib/fetcher";
 import { formatCurrency } from "@/lib/format";
 import { useEventEnded } from "@/lib/hooks";
+import { DEFAULT_LOAN_INTEREST_RATE_PERCENT, LOAN_COMPOUND_PERIODS } from "@/lib/constants";
 import { TimerControl } from "./TimerControl";
 import type { TeamSummary } from "@/lib/types";
 
@@ -22,6 +23,7 @@ export function LenderCard({
   const locked = eventEnded && session?.user?.role !== "ADMIN";
 
   const [principal, setPrincipal] = useState("");
+  const [ratePercent, setRatePercent] = useState(String(DEFAULT_LOAN_INTEREST_RATE_PERCENT));
   const [submittingPrincipal, setSubmittingPrincipal] = useState(false);
   const [timerBusy, setTimerBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,15 +48,22 @@ export function LenderCard({
       setError("Enter a positive whole number for the principal");
       return;
     }
+    const ratePct = Number(ratePercent);
+    if (!Number.isFinite(ratePct) || ratePct <= 0 || ratePct > 500) {
+      setError("Enter a valid interest rate percentage (e.g. 8, 12, 15)");
+      return;
+    }
     setSubmittingPrincipal(true);
     setError(null);
     try {
       await apiRequest(`/api/teams/${team.id}/transactions`, "POST", {
         amount,
-        note: "Loan principal disbursed",
+        note: `Loan principal disbursed at ${ratePct}% interest`,
         stationId,
+        interestRate: ratePct / 100,
       });
       setPrincipal("");
+      setRatePercent(String(DEFAULT_LOAN_INTEREST_RATE_PERCENT));
       onChanged();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -98,6 +107,20 @@ export function LenderCard({
             className="input py-1.5"
           />
         </div>
+        <div className="sm:w-28">
+          <label className="label">Interest rate (%)</label>
+          <input
+            type="number"
+            min="0.1"
+            max="500"
+            step="0.1"
+            value={ratePercent}
+            onChange={(e) => setRatePercent(e.target.value)}
+            placeholder="e.g. 12"
+            disabled={locked}
+            className="input py-1.5"
+          />
+        </div>
         <button
           type="submit"
           disabled={submittingPrincipal || locked}
@@ -106,6 +129,10 @@ export function LenderCard({
           Add Principal
         </button>
       </form>
+
+      <p className="mt-2 text-xs text-[var(--text-muted)]">
+        Repaid automatically at Final Settlement: principal × (1 + rate) ^ {LOAN_COMPOUND_PERIODS}.
+      </p>
 
       {locked && (
         <p className="mt-2 text-xs text-[var(--gold-dim)]">

@@ -42,6 +42,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "A note describing the adjustment is required" }, { status: 400 });
   }
 
+  let interestRate: number | null = null;
+  if (body?.interestRate !== undefined && body?.interestRate !== null) {
+    const rate = Number(body.interestRate);
+    if (!Number.isFinite(rate) || rate <= 0 || rate > 5) {
+      return NextResponse.json({ error: "Interest rate must be a positive percentage (up to 500%)" }, { status: 400 });
+    }
+    if (amount <= 0) {
+      return NextResponse.json({ error: "An interest rate can only be set on a loan disbursement" }, { status: 400 });
+    }
+    interestRate = rate;
+  }
+
   let stationId: string | null;
   if (session.user.role === "MODERATOR" || session.user.role === "BANKER") {
     if (!session.user.stationId) {
@@ -63,6 +75,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       stationId,
       amount,
       note,
+      interestRate,
       createdById: session.user.id,
     },
     include: {

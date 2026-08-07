@@ -2,8 +2,9 @@ export const STARTING_CASH = 100_000;
 export const TIMER_BUDGET_SECONDS = 45 * 60;
 export const LENDER_STATION_NUMBER = 7;
 
-// Loan settlement: total repayment = principal * (1 + LOAN_INTEREST_RATE) ** LOAN_COMPOUND_PERIODS
-export const LOAN_INTEREST_RATE = 0.08;
+// Loan settlement: each loan repays as principal * (1 + its own interestRate) ** LOAN_COMPOUND_PERIODS.
+// The Banker picks the rate per loan; this is just the pre-filled suggestion in that form.
+export const DEFAULT_LOAN_INTEREST_RATE_PERCENT = 8;
 export const LOAN_COMPOUND_PERIODS = 5;
 
 export const STATIONS = [

@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session-guards";
 import { getEventState } from "@/lib/event";
-import { LENDER_STATION_NUMBER, LOAN_INTEREST_RATE, LOAN_COMPOUND_PERIODS } from "@/lib/constants";
+import { LENDER_STATION_NUMBER, DEFAULT_LOAN_INTEREST_RATE_PERCENT, LOAN_COMPOUND_PERIODS } from "@/lib/constants";
+
+const FALLBACK_RATE = DEFAULT_LOAN_INTEREST_RATE_PERCENT / 100;
 
 export async function POST() {
   const guard = await requireAdmin();
@@ -17,34 +19,57 @@ export async function POST() {
   const lenderStation = await prisma.station.findUnique({ where: { number: LENDER_STATION_NUMBER } });
   const teams = await prisma.team.findMany();
 
-  const settlements: { teamId: string; teamName: string; principal: number; interest: number; totalDue: number }[] = [];
+  const settlements: {
+    teamId: string;
+    teamName: string;
+    loans: number;
+    principal: number;
+    interest: number;
+    totalDue: number;
+  }[] = [];
   const now = new Date();
 
   for (const team of teams) {
     if (lenderStation) {
-      const principalAgg = await prisma.transaction.aggregate({
+      const loans = await prisma.transaction.findMany({
         where: { teamId: team.id, stationId: lenderStation.id, amount: { gt: 0 } },
-        _sum: { amount: true },
       });
-      const principal = principalAgg._sum.amount ?? 0;
 
-      if (principal > 0) {
-        const totalDue = Math.round(principal * (1 + LOAN_INTEREST_RATE) ** LOAN_COMPOUND_PERIODS);
-        const interest = totalDue - principal;
+      if (loans.length > 0) {
+        let teamPrincipal = 0;
+        let teamInterest = 0;
+        let teamTotalDue = 0;
 
-        await prisma.transaction.create({
-          data: {
-            teamId: team.id,
-            stationId: lenderStation.id,
-            amount: -totalDue,
-            note: `Loan settlement: ₹${principal.toLocaleString("en-IN")} principal + ₹${interest.toLocaleString(
-              "en-IN",
-            )} compound interest (8% × 5) at final settlement`,
-            createdById: session.user.id,
-          },
+        for (const loan of loans) {
+          const rate = loan.interestRate ?? FALLBACK_RATE;
+          const totalDue = Math.round(loan.amount * (1 + rate) ** LOAN_COMPOUND_PERIODS);
+          const interest = totalDue - loan.amount;
+
+          await prisma.transaction.create({
+            data: {
+              teamId: team.id,
+              stationId: lenderStation.id,
+              amount: -totalDue,
+              note: `Loan repayment: ₹${loan.amount.toLocaleString("en-IN")} principal + ₹${interest.toLocaleString(
+                "en-IN",
+              )} interest at ${(rate * 100).toFixed(1)}% × ${LOAN_COMPOUND_PERIODS} periods`,
+              createdById: session.user.id,
+            },
+          });
+
+          teamPrincipal += loan.amount;
+          teamInterest += interest;
+          teamTotalDue += totalDue;
+        }
+
+        settlements.push({
+          teamId: team.id,
+          teamName: team.name,
+          loans: loans.length,
+          principal: teamPrincipal,
+          interest: teamInterest,
+          totalDue: teamTotalDue,
         });
-
-        settlements.push({ teamId: team.id, teamName: team.name, principal, interest, totalDue });
       }
     }
 

@@ -9,7 +9,14 @@ import type { TeamSummary } from "@/lib/types";
 
 const RANK_COLORS = ["#e8c766", "#c7c7d1", "#c98a4b"];
 
-type Settlement = { teamId: string; teamName: string; principal: number; interest: number; totalDue: number };
+type Settlement = {
+  teamId: string;
+  teamName: string;
+  loans: number;
+  principal: number;
+  interest: number;
+  totalDue: number;
+};
 
 export default function AdminDashboardPage() {
   const { data: teams, error, isLoading, mutate } = useSWR<TeamSummary[]>("/api/teams", fetcher, {
@@ -29,7 +36,7 @@ export default function AdminDashboardPage() {
   async function handleEndEvent() {
     if (
       !confirm(
-        "End the event now? This settles every team's outstanding bank loans (principal + 8% compound interest × 5), freezes all timers, and locks moderators/banker out of further changes. This cannot be undone.",
+        "End the event now? This settles every team's outstanding bank loans (each loan's own principal + interest rate, compounded × 5), freezes all timers, and locks moderators/banker out of further changes. This cannot be undone.",
       )
     ) {
       return;
@@ -86,7 +93,9 @@ export default function AdminDashboardPage() {
             <ul className="space-y-1 text-sm">
               {settlements.map((s) => (
                 <li key={s.teamId} className="flex justify-between text-[var(--text)]">
-                  <span>{s.teamName}</span>
+                  <span>
+                    {s.teamName} <span className="text-[var(--text-muted)]">({s.loans} loan{s.loans === 1 ? "" : "s"})</span>
+                  </span>
                   <span className="text-red-400">
                     −{formatCurrency(s.totalDue)} ({formatCurrency(s.principal)} principal + {formatCurrency(s.interest)} interest)
                   </span>

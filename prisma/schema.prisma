@@ -68,6 +68,9 @@ model Transaction {
   stationId String?
   amount    Int
   note      String
+  // Set only on loan-principal transactions disbursed by the Banker; the fraction (e.g. 0.12 for 12%)
+  // applied at Final Settlement to that specific loan, compounded over LOAN_COMPOUND_PERIODS.
+  interestRate Float?
   createdBy   User?   @relation(fields: [createdById], references: [id])
   createdById String?
   createdAt DateTime @default(now())
