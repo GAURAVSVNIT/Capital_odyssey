@@ -104,10 +104,10 @@ export default function TeamLedgerPage() {
 
       <form onSubmit={handleSubmit} className="card mt-4 p-4">
         <h2 className="mb-3 text-sm font-semibold text-[var(--text-muted)]">Add adjustment</h2>
-        <div className="flex flex-wrap items-end gap-3">
-          <div>
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+          <div className="sm:w-36">
             <label className="label">Amount (± ₹)</label>
-            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="input w-36" />
+            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="input" />
           </div>
           <div>
             <label className="label">Station (optional)</label>
@@ -120,7 +120,7 @@ export default function TeamLedgerPage() {
               ))}
             </select>
           </div>
-          <div className="min-w-[12rem] flex-1">
+          <div className="sm:min-w-[12rem] sm:flex-1">
             <label className="label">Note</label>
             <input
               type="text"
@@ -130,7 +130,7 @@ export default function TeamLedgerPage() {
               className="input"
             />
           </div>
-          <button type="submit" disabled={submitting} className="btn-primary">
+          <button type="submit" disabled={submitting} className="btn-primary w-full sm:w-auto">
             Add
           </button>
         </div>
@@ -144,17 +144,18 @@ export default function TeamLedgerPage() {
             <thead>
               <tr>
                 <th>When</th>
-                <th>Station</th>
+                <th className="hidden sm:table-cell">Station</th>
                 <th>Note</th>
-                <th>By</th>
+                <th className="hidden sm:table-cell">By</th>
                 <th className="text-right">Amount</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="text-[var(--text-muted)]" colSpan={4}>
-                  Starting capital
-                </td>
+                <td className="text-xs text-[var(--text-muted)]">—</td>
+                <td className="hidden text-xs text-[var(--text-muted)] sm:table-cell">—</td>
+                <td className="text-[var(--text-muted)]">Starting capital</td>
+                <td className="hidden text-xs text-[var(--text-muted)] sm:table-cell">—</td>
                 <td className="text-right font-medium text-[var(--text)]">{formatCurrency(STARTING_CASH)}</td>
               </tr>
               {transactions?.map((tx) => (

@@ -52,7 +52,7 @@ export default async function LoginPage({
           </h1>
         </div>
 
-        <div className="card p-8">
+        <div className="card p-6 sm:p-8">
           <p className="mb-6 text-sm text-[var(--text-muted)]">Sign in to continue</p>
 
           {error && (

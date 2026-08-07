@@ -1,17 +1,19 @@
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
+import { MobileNavToggle } from "./MobileNavToggle";
 
 export async function NavBar() {
   const session = await auth();
   if (!session?.user) return null;
 
   return (
-    <header className="border-b border-[var(--border-gold)] bg-[var(--bg-elevated)]">
+    <header className="relative border-b border-[var(--border-gold)] bg-[var(--bg-elevated)]">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
         <Link href="/" className="font-display text-lg font-semibold uppercase text-[var(--gold-bright)]">
           Capital Odyssey
         </Link>
-        <nav className="flex items-center gap-5 text-sm text-[var(--text-muted)]">
+
+        <MobileNavToggle>
           {session.user.role === "ADMIN" && (
             <>
               <Link href="/admin" className="hover:text-[var(--gold-bright)]">
@@ -41,7 +43,7 @@ export async function NavBar() {
               Sign out
             </button>
           </form>
-        </nav>
+        </MobileNavToggle>
       </div>
     </header>
   );

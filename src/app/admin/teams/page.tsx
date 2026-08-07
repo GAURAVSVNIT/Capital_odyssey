@@ -49,20 +49,20 @@ export default function AdminTeamsPage() {
 
       <form onSubmit={handleCreate} className="card mb-8 p-4">
         <h2 className="mb-3 text-sm font-semibold text-[var(--text-muted)]">Register a new team</h2>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Team name"
-            className="input min-w-[10rem] flex-1"
+            className="input sm:min-w-[10rem] sm:flex-1"
           />
           <input
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Note (optional)"
-            className="input min-w-[10rem] flex-1"
+            className="input sm:min-w-[10rem] sm:flex-1"
           />
-          <button disabled={submitting} type="submit" className="btn-primary">
+          <button disabled={submitting} type="submit" className="btn-primary w-full sm:w-auto">
             Register
           </button>
         </div>
@@ -71,7 +71,7 @@ export default function AdminTeamsPage() {
 
       <div className="space-y-2">
         {teams?.map((team) => (
-          <div key={team.id} className="card flex items-center justify-between px-4 py-3">
+          <div key={team.id} className="card flex flex-wrap items-center justify-between gap-2 px-4 py-3">
             <div>
               <Link href={`/admin/teams/${team.id}`} className="font-medium text-[var(--text)] hover:text-[var(--gold-bright)] hover:underline">
                 {team.name}

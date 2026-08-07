@@ -85,18 +85,21 @@ export function TeamCard({
         />
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-3 flex flex-wrap items-end gap-2 border-t border-[var(--border-gold)] pt-3">
-        <div>
+      <form
+        onSubmit={handleSubmit}
+        className="mt-3 flex flex-col gap-2 border-t border-[var(--border-gold)] pt-3 sm:flex-row sm:flex-wrap sm:items-end"
+      >
+        <div className="sm:w-32">
           <label className="label">Amount (± ₹)</label>
           <input
             type="number"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="e.g. -5000"
-            className="input w-32 py-1.5"
+            className="input py-1.5"
           />
         </div>
-        <div className="min-w-[10rem] flex-1">
+        <div className="sm:min-w-[10rem] sm:flex-1">
           <label className="label">Note</label>
           <input
             type="text"
@@ -106,7 +109,7 @@ export function TeamCard({
             className="input py-1.5"
           />
         </div>
-        <button type="submit" disabled={submitting} className="btn-primary py-1.5">
+        <button type="submit" disabled={submitting} className="btn-primary w-full py-1.5 sm:w-auto">
           Add
         </button>
       </form>

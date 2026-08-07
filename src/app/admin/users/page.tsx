@@ -50,19 +50,19 @@ export default function AdminUsersPage() {
 
       <form onSubmit={handleCreate} className="card mb-8 p-4">
         <h2 className="mb-3 text-sm font-semibold text-[var(--text-muted)]">Create a moderator account</h2>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Username"
-            className="input min-w-[8rem] flex-1"
+            className="input sm:min-w-[8rem] sm:flex-1"
           />
           <input
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             type="text"
             placeholder="Password"
-            className="input min-w-[8rem] flex-1"
+            className="input sm:min-w-[8rem] sm:flex-1"
           />
           <select value={stationId} onChange={(e) => setStationId(e.target.value)} className="input">
             <option value="">Assign station…</option>
@@ -72,7 +72,7 @@ export default function AdminUsersPage() {
               </option>
             ))}
           </select>
-          <button type="submit" disabled={submitting} className="btn-primary">
+          <button type="submit" disabled={submitting} className="btn-primary w-full sm:w-auto">
             Create
           </button>
         </div>
@@ -81,7 +81,7 @@ export default function AdminUsersPage() {
 
       <div className="space-y-2">
         {users?.map((u) => (
-          <div key={u.id} className="card flex items-center justify-between px-4 py-3">
+          <div key={u.id} className="card flex flex-wrap items-center justify-between gap-2 px-4 py-3">
             <div>
               <p className="font-medium text-[var(--text)]">{u.username}</p>
               <p className="text-xs text-[var(--text-muted)]">
