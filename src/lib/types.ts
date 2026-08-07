@@ -1,3 +1,6 @@
+export type UserRole = "ADMIN" | "MODERATOR" | "BANKER" | "REGISTRAR";
+export type StaffRole = Exclude<UserRole, "ADMIN">;
+
 export type TimerStatus = "NOT_STARTED" | "RUNNING" | "PAUSED" | "FINISHED";
 
 export type TeamSummary = {
@@ -22,10 +25,10 @@ export type TransactionEntry = {
 
 export type StationSummary = { id: string; number: number; name: string };
 
-export type ModeratorSummary = {
+export type StaffSummary = {
   id: string;
   username: string;
-  role: "MODERATOR";
+  role: StaffRole;
   createdAt: string;
   station: { number: number; name: string } | null;
 };

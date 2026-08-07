@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/session-guards";
+import { requireRole } from "@/lib/session-guards";
 import { serializeTeam, timerRemainingSeconds } from "@/lib/team-utils";
 
 type Action = "start" | "pause" | "resume" | "finish";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const guard = await requireUser();
+  const guard = await requireRole("ADMIN", "MODERATOR", "BANKER");
   if ("error" in guard) return guard.error;
 
   const { id } = await params;

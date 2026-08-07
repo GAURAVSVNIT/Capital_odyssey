@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
+import type { UserRole } from "@/lib/types";
 
 export async function requireUser() {
   const session = await auth();
@@ -9,11 +10,15 @@ export async function requireUser() {
   return { session } as const;
 }
 
-export async function requireAdmin() {
+export async function requireRole(...roles: UserRole[]) {
   const result = await requireUser();
   if ("error" in result) return result;
-  if (result.session.user.role !== "ADMIN") {
+  if (!roles.includes(result.session.user.role)) {
     return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) } as const;
   }
   return result;
+}
+
+export async function requireAdmin() {
+  return requireRole("ADMIN");
 }

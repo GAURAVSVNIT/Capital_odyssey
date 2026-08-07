@@ -13,6 +13,8 @@ datasource db {
 enum Role {
   ADMIN
   MODERATOR
+  BANKER
+  REGISTRAR
 }
 
 enum TimerStatus {

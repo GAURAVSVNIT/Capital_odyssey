@@ -1,5 +1,6 @@
 export const STARTING_CASH = 100_000;
 export const TIMER_BUDGET_SECONDS = 45 * 60;
+export const LENDER_STATION_NUMBER = 7;
 
 export const STATIONS = [
   { number: 1, name: "Investment Exchange" },

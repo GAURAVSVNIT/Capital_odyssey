@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, requireUser } from "@/lib/session-guards";
+import { requireAdmin, requireRole, requireUser } from "@/lib/session-guards";
 import { serializeTeam } from "@/lib/team-utils";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -21,7 +21,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const guard = await requireAdmin();
+  const guard = await requireRole("ADMIN", "REGISTRAR");
   if ("error" in guard) return guard.error;
 
   const { id } = await params;

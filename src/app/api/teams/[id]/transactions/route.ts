@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireUser } from "@/lib/session-guards";
+import { requireRole, requireUser } from "@/lib/session-guards";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const guard = await requireUser();
@@ -20,7 +20,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 }
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const guard = await requireUser();
+  const guard = await requireRole("ADMIN", "MODERATOR", "BANKER");
   if ("error" in guard) return guard.error;
   const { session } = guard;
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   let stationId: string | null;
-  if (session.user.role === "MODERATOR") {
+  if (session.user.role === "MODERATOR" || session.user.role === "BANKER") {
     if (!session.user.stationId) {
       return NextResponse.json({ error: "Your account is not assigned to a station" }, { status: 403 });
     }

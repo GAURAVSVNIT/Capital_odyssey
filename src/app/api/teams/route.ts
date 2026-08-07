@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin, requireUser } from "@/lib/session-guards";
+import { requireRole, requireUser } from "@/lib/session-guards";
 import { serializeTeam } from "@/lib/team-utils";
 
 export async function GET() {
@@ -18,7 +18,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const guard = await requireAdmin();
+  const guard = await requireRole("ADMIN", "REGISTRAR");
   if ("error" in guard) return guard.error;
 
   const body = await req.json().catch(() => null);

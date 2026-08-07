@@ -23,13 +23,23 @@ export async function NavBar() {
                 Teams
               </Link>
               <Link href="/admin/users" className="hover:text-[var(--gold-bright)]">
-                Moderators
+                Staff
               </Link>
             </>
           )}
           {session.user.role === "MODERATOR" && session.user.stationNumber != null && (
             <Link href={`/station/${session.user.stationNumber}`} className="hover:text-[var(--gold-bright)]">
               My Station
+            </Link>
+          )}
+          {session.user.role === "BANKER" && (
+            <Link href="/banker" className="hover:text-[var(--gold-bright)]">
+              The Bank
+            </Link>
+          )}
+          {session.user.role === "REGISTRAR" && (
+            <Link href="/registrar" className="hover:text-[var(--gold-bright)]">
+              Register Teams
             </Link>
           )}
           <span className="text-[var(--gold-dim)]">{session.user.name}</span>
