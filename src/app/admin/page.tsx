@@ -29,6 +29,8 @@ export default function AdminDashboardPage() {
   const [ending, setEnding] = useState(false);
   const [endError, setEndError] = useState<string | null>(null);
   const [settlements, setSettlements] = useState<Settlement[] | null>(null);
+  const [starting, setStarting] = useState(false);
+  const [startError, setStartError] = useState<string | null>(null);
 
   const sorted = teams ? [...teams].sort((a, b) => b.balance - a.balance) : [];
   const eventEnded = eventState?.endedAt != null;
@@ -55,6 +57,33 @@ export default function AdminDashboardPage() {
     }
   }
 
+  async function handleStartEvent() {
+    const teamCount = teams?.length ?? 0;
+    const warned = confirm(
+      `Start a new event? This permanently deletes all ${teamCount} registered team(s) and their entire transaction ledger, and unlocks the app for a fresh run. This cannot be undone.`,
+    );
+    if (!warned) return;
+
+    const typed = prompt('Type "DELETE ALL" (without quotes) to confirm wiping every team:');
+    if (typed !== "DELETE ALL") {
+      if (typed !== null) alert("Confirmation text didn't match — Start Event was cancelled.");
+      return;
+    }
+
+    setStarting(true);
+    setStartError(null);
+    try {
+      await apiRequest("/api/event/start", "POST");
+      setSettlements(null);
+      mutateEvent();
+      mutate();
+    } catch (err) {
+      setStartError(err instanceof Error ? err.message : "Failed to start the event");
+    } finally {
+      setStarting(false);
+    }
+  }
+
   return (
     <div className="page">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
@@ -66,6 +95,13 @@ export default function AdminDashboardPage() {
           <Link href="/admin/users" className="btn-outline">
             Staff
           </Link>
+          <button
+            onClick={handleStartEvent}
+            disabled={starting}
+            className="rounded-md border border-red-500 bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 disabled:opacity-50"
+          >
+            {starting ? "Starting…" : "Start Event"}
+          </button>
           {eventEnded ? (
             <span className="flex items-center rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-xs font-medium uppercase tracking-wide text-red-300">
               Event ended{eventState?.endedAt ? ` · ${new Date(eventState.endedAt).toLocaleTimeString()}` : ""}
@@ -82,6 +118,7 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
+      {startError && <p className="mb-4 text-sm text-red-400">{startError}</p>}
       {endError && <p className="mb-4 text-sm text-red-400">{endError}</p>}
 
       {settlements && (
