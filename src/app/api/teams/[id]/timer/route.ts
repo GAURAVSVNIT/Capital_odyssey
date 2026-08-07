@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireRole } from "@/lib/session-guards";
 import { serializeTeam, timerRemainingSeconds } from "@/lib/team-utils";
+import { isEventEnded } from "@/lib/event";
 
 type Action = "start" | "pause" | "resume" | "finish";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const guard = await requireRole("ADMIN", "MODERATOR", "BANKER");
   if ("error" in guard) return guard.error;
+  const { session } = guard;
+
+  if (session.user.role !== "ADMIN" && (await isEventEnded())) {
+    return NextResponse.json({ error: "The event has ended; only an admin can make changes now" }, { status: 403 });
+  }
 
   const { id } = await params;
   const body = await req.json().catch(() => null);

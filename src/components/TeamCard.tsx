@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useSession } from "next-auth/react";
 import { apiRequest } from "@/lib/fetcher";
 import { formatCurrency } from "@/lib/format";
+import { useEventEnded } from "@/lib/hooks";
 import { TimerControl } from "./TimerControl";
 import type { TeamSummary } from "@/lib/types";
 
@@ -15,6 +17,10 @@ export function TeamCard({
   onChanged: () => void;
   stationId?: string;
 }) {
+  const { data: session } = useSession();
+  const eventEnded = useEventEnded();
+  const locked = eventEnded && session?.user?.role !== "ADMIN";
+
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -81,7 +87,7 @@ export function TeamCard({
           status={team.timerStatus}
           remainingSeconds={team.timerRemainingSeconds}
           onAction={handleTimerAction}
-          busy={timerBusy}
+          busy={timerBusy || locked}
         />
       </div>
 
@@ -96,6 +102,7 @@ export function TeamCard({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="e.g. -5000"
+            disabled={locked}
             className="input py-1.5"
           />
         </div>
@@ -106,14 +113,20 @@ export function TeamCard({
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder="Reason for adjustment"
+            disabled={locked}
             className="input py-1.5"
           />
         </div>
-        <button type="submit" disabled={submitting} className="btn-primary w-full py-1.5 sm:w-auto">
+        <button type="submit" disabled={submitting || locked} className="btn-primary w-full py-1.5 sm:w-auto">
           Add
         </button>
       </form>
 
+      {locked && (
+        <p className="mt-2 text-xs text-[var(--gold-dim)]">
+          The event has ended. Only an admin can make further changes.
+        </p>
+      )}
       {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
     </div>
   );

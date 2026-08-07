@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useSession } from "next-auth/react";
 import { apiRequest } from "@/lib/fetcher";
 import { formatCurrency } from "@/lib/format";
+import { useEventEnded } from "@/lib/hooks";
 import { TimerControl } from "./TimerControl";
 import type { TeamSummary } from "@/lib/types";
 
@@ -15,10 +17,12 @@ export function LenderCard({
   onChanged: () => void;
   stationId: string;
 }) {
+  const { data: session } = useSession();
+  const eventEnded = useEventEnded();
+  const locked = eventEnded && session?.user?.role !== "ADMIN";
+
   const [principal, setPrincipal] = useState("");
-  const [interest, setInterest] = useState("");
   const [submittingPrincipal, setSubmittingPrincipal] = useState(false);
-  const [submittingInterest, setSubmittingInterest] = useState(false);
   const [timerBusy, setTimerBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,18 +39,10 @@ export function LenderCard({
     }
   }
 
-  function parsePositiveAmount(raw: string) {
-    const parsed = Number(raw);
-    if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) {
-      return null;
-    }
-    return parsed;
-  }
-
   async function handleAddPrincipal(e: FormEvent) {
     e.preventDefault();
-    const amount = parsePositiveAmount(principal);
-    if (amount === null) {
+    const amount = Number(principal);
+    if (!Number.isFinite(amount) || !Number.isInteger(amount) || amount <= 0) {
       setError("Enter a positive whole number for the principal");
       return;
     }
@@ -64,30 +60,6 @@ export function LenderCard({
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setSubmittingPrincipal(false);
-    }
-  }
-
-  async function handleAddInterest(e: FormEvent) {
-    e.preventDefault();
-    const amount = parsePositiveAmount(interest);
-    if (amount === null) {
-      setError("Enter a positive whole number for the interest");
-      return;
-    }
-    setSubmittingInterest(true);
-    setError(null);
-    try {
-      await apiRequest(`/api/teams/${team.id}/transactions`, "POST", {
-        amount: -amount,
-        note: "Loan interest charged",
-        stationId,
-      });
-      setInterest("");
-      onChanged();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setSubmittingInterest(false);
     }
   }
 
@@ -109,46 +81,37 @@ export function LenderCard({
           status={team.timerStatus}
           remainingSeconds={team.timerRemainingSeconds}
           onAction={handleTimerAction}
-          busy={timerBusy}
+          busy={timerBusy || locked}
         />
       </div>
 
-      <div className="mt-3 grid grid-cols-1 gap-3 border-t border-[var(--border-gold)] pt-3 sm:grid-cols-2">
-        <form onSubmit={handleAddPrincipal} className="flex flex-col gap-2 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <label className="label">Principal (₹)</label>
-            <input
-              type="number"
-              min="1"
-              value={principal}
-              onChange={(e) => setPrincipal(e.target.value)}
-              placeholder="e.g. 20000"
-              className="input py-1.5"
-            />
-          </div>
-          <button type="submit" disabled={submittingPrincipal} className="btn-primary w-full py-1.5 sm:w-auto">
-            Add Principal
-          </button>
-        </form>
+      <form onSubmit={handleAddPrincipal} className="mt-3 flex flex-col gap-2 border-t border-[var(--border-gold)] pt-3 sm:flex-row sm:items-end">
+        <div className="flex-1">
+          <label className="label">Principal (₹)</label>
+          <input
+            type="number"
+            min="1"
+            value={principal}
+            onChange={(e) => setPrincipal(e.target.value)}
+            placeholder="e.g. 20000"
+            disabled={locked}
+            className="input py-1.5"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={submittingPrincipal || locked}
+          className="btn-primary w-full py-1.5 sm:w-auto"
+        >
+          Add Principal
+        </button>
+      </form>
 
-        <form onSubmit={handleAddInterest} className="flex flex-col gap-2 sm:flex-row sm:items-end">
-          <div className="flex-1">
-            <label className="label">Interest (₹)</label>
-            <input
-              type="number"
-              min="1"
-              value={interest}
-              onChange={(e) => setInterest(e.target.value)}
-              placeholder="e.g. 2000"
-              className="input py-1.5"
-            />
-          </div>
-          <button type="submit" disabled={submittingInterest} className="btn-outline w-full py-1.5 sm:w-auto">
-            Add Interest
-          </button>
-        </form>
-      </div>
-
+      {locked && (
+        <p className="mt-2 text-xs text-[var(--gold-dim)]">
+          The event has ended. Loans are now settled automatically — only an admin can make further changes.
+        </p>
+      )}
       {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
     </div>
   );

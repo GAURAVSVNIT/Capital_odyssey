@@ -30,6 +30,12 @@ async function main() {
     },
   });
 
+  await prisma.eventState.upsert({
+    where: { id: 1 },
+    update: {},
+    create: { id: 1 },
+  });
+
   console.log(`Seeded ${STATIONS.length} stations and admin user "${adminUsername}".`);
 }
 
