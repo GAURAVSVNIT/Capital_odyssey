@@ -5,6 +5,7 @@ import Link from "next/link";
 import useSWR from "swr";
 import { fetcher, apiRequest } from "@/lib/fetcher";
 import { formatCurrency, formatDuration } from "@/lib/format";
+import { downloadCsv } from "@/lib/csv";
 import type { TeamSummary } from "@/lib/types";
 
 const RANK_COLORS = ["#e8c766", "#c7c7d1", "#c98a4b"];
@@ -57,6 +58,20 @@ export default function AdminDashboardPage() {
     }
   }
 
+  function handleExportCsv() {
+    const headers = ["Rank", "Team", "Final Net Worth (INR)", "Time Used", "Time Remaining", "Timer Status"];
+    const rows = sorted.map((team, idx) => [
+      idx + 1,
+      team.name,
+      team.balance,
+      formatDuration(team.timerBudgetSeconds - team.timerRemainingSeconds),
+      formatDuration(team.timerRemainingSeconds),
+      timerStatusLabel(team.timerStatus),
+    ]);
+    const date = new Date().toISOString().slice(0, 10);
+    downloadCsv(`capital-odyssey-leaderboard-${date}.csv`, headers, rows);
+  }
+
   async function handleStartEvent() {
     const teamCount = teams?.length ?? 0;
     const warned = confirm(
@@ -95,6 +110,9 @@ export default function AdminDashboardPage() {
           <Link href="/admin/users" className="btn-outline">
             Staff
           </Link>
+          <button onClick={handleExportCsv} disabled={sorted.length === 0} className="btn-outline disabled:opacity-50">
+            Export CSV
+          </button>
           <button
             onClick={handleStartEvent}
             disabled={starting}
@@ -194,15 +212,21 @@ export default function AdminDashboardPage() {
   );
 }
 
+function timerStatusLabel(status: TeamSummary["timerStatus"]) {
+  switch (status) {
+    case "NOT_STARTED":
+      return "Not started";
+    case "RUNNING":
+      return "Running";
+    case "PAUSED":
+      return "Paused";
+    case "FINISHED":
+      return "Finished";
+  }
+}
+
 function TimerBadge({ status, remaining }: { status: TeamSummary["timerStatus"]; remaining: number }) {
-  const label =
-    status === "NOT_STARTED"
-      ? "Not started"
-      : status === "RUNNING"
-        ? "Running"
-        : status === "PAUSED"
-          ? "Paused"
-          : "Finished";
+  const label = timerStatusLabel(status);
   const color =
     status === "RUNNING"
       ? "text-emerald-400"
