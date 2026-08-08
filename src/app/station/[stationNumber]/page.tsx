@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { StationTeamList } from "./StationTeamList";
+import { BiasedRandomGenerator } from "@/components/BiasedRandomGenerator";
 
 export default async function StationPage({
   params,
@@ -25,6 +26,7 @@ export default async function StationPage({
       <p className="mb-6 text-sm text-[var(--text-muted)]">
         Search a team, manage their timer, and record cash adjustments for this station.
       </p>
+      {station.number === 1 && <BiasedRandomGenerator />}
       <StationTeamList stationId={station.id} />
     </div>
   );
