@@ -6,6 +6,7 @@ import { apiRequest } from "@/lib/fetcher";
 import { formatCurrency } from "@/lib/format";
 import { useEventEnded } from "@/lib/hooks";
 import { TimerControl } from "./TimerControl";
+import { SignedAmountInput } from "./SignedAmountInput";
 import type { TeamSummary } from "@/lib/types";
 
 export function TeamCard({
@@ -95,15 +96,14 @@ export function TeamCard({
         onSubmit={handleSubmit}
         className="mt-3 flex flex-col gap-2 border-t border-[var(--border-gold)] pt-3 sm:flex-row sm:flex-wrap sm:items-end"
       >
-        <div className="sm:w-32">
-          <label className="label">Amount (± ₹)</label>
-          <input
-            type="number"
+        <div className="sm:w-44">
+          <label className="label">Amount (₹)</label>
+          <SignedAmountInput
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="e.g. -5000"
+            onChange={setAmount}
+            placeholder="e.g. 5000"
             disabled={locked}
-            className="input py-1.5"
+            inputClassName="py-1.5"
           />
         </div>
         <div className="sm:min-w-[10rem] sm:flex-1">

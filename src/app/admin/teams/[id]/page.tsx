@@ -8,6 +8,7 @@ import { fetcher, apiRequest } from "@/lib/fetcher";
 import { formatCurrency } from "@/lib/format";
 import { STARTING_CASH } from "@/lib/constants";
 import { TimerControl } from "@/components/TimerControl";
+import { SignedAmountInput } from "@/components/SignedAmountInput";
 import type { TeamSummary, TransactionEntry, StationSummary } from "@/lib/types";
 
 export default function TeamLedgerPage() {
@@ -105,9 +106,9 @@ export default function TeamLedgerPage() {
       <form onSubmit={handleSubmit} className="card mt-4 p-4">
         <h2 className="mb-3 text-sm font-semibold text-[var(--text-muted)]">Add adjustment</h2>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-          <div className="sm:w-36">
-            <label className="label">Amount (± ₹)</label>
-            <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} className="input" />
+          <div className="sm:w-44">
+            <label className="label">Amount (₹)</label>
+            <SignedAmountInput value={amount} onChange={setAmount} placeholder="e.g. 5000" />
           </div>
           <div>
             <label className="label">Station (optional)</label>
